@@ -3,9 +3,19 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "apollo-client": "^2.0.3",
+    "apollo-client-preset": "^1.0.5",
+    "apollo-upload-client": "^7.0.0-alpha.1",
+    "axios": "^0.17.1",
+    "graphql": "^0.11.7",
+    "graphql-tag": "^2.6.1",
+    "object-path": "^0.11.4",
+    "query-string": "^5.0.1",
     "react": "^16.2.0",
+    "react-apollo": "^2.0.4",
     "react-dom": "^16.2.0",
-    "react-scripts": "1.0.17"
+    "react-scripts": "1.0.17",
+    "recursive-iterator": "^3.3.0"
   },
   "scripts": {
     "start": "react-scripts start",
