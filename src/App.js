@@ -43,8 +43,7 @@ class App extends Component {
     this.props.mutate({ 
         variables: { 
           input : {
-            file: target.files[0].name,
-            // files: target.files[0]
+            file: target.files[0].name
           } 
         }
       }
@@ -76,8 +75,8 @@ const submitFile = gql`
 `;
 
 // const submitFile = gql`
-//   mutation($file: FileInput!) {
-//     uploadFile(input: $file){
+//   mutation($input: FileInput!) {
+//     uploadFile(input: $input){
 //       entity{
 //         ...on FileFile {
 //           url

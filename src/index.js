@@ -6,7 +6,7 @@ import registerServiceWorker from './registerServiceWorker';
 
 import axios from 'axios';
 import Querystring from 'query-string';
-// import { HttpLink } from 'apollo-link-http';
+import { HttpLink } from 'apollo-link-http';
 import { ApolloClient } from 'apollo-client'
 import { createUploadLink } from "apollo-upload-client/lib/main";
 import { InMemoryCache } from 'apollo-cache-inmemory';
@@ -21,8 +21,8 @@ const CONSUMER_CREDENTIALS = {
   password: 'test'
 };
 
-const initializeCsrfToken = () => {
-  return axios.get(URL + '/session/token')
+async function initializeCsrfToken(){
+  let result = await axios.get(URL + '/session/token')
     .then(response => {
       return response.data;
     })
@@ -30,10 +30,11 @@ const initializeCsrfToken = () => {
       console.log('error ' + error);
       return null;
     });
+  return result;
 };
 
-const initializeOauthToken = () => {
-  return axios.post(URL + '/oauth/token', Querystring.stringify(CONSUMER_CREDENTIALS))
+async function initializeOauthToken(){
+  let result = await axios.post(URL + '/oauth/token', Querystring.stringify(CONSUMER_CREDENTIALS))
     .then(response => {
       return 'Bearer '.concat(response.data.access_token);
     })
@@ -41,32 +42,36 @@ const initializeOauthToken = () => {
       console.log('error ' + error);
       return null;
     });
+
+  return result;
 };
 
 const initializeHeaders = () => {
+  const csrfToken = initializeCsrfToken()
+    .then( response => { return response })
+    .catch( error => { return null });
+
+  const oAuthToken = initializeOauthToken()
+    .then( response => { return response })
+    .catch((error) => { return null });
+  
   const headers = {
-    'X-CSRF-Token': initializeCsrfToken().then(
-      (response) => { console.log(response); return response }
-    ).catch((error) => {
-      console.log('error ' + error);
-      return null;
-    }),
-    authorization: initializeOauthToken().then(
-      (response) => { console.log(response); return response }
-    ).catch((error) => {
-      console.log('error ' + error);
-      return null;
-    })
+    'X-CSRF-Token': csrfToken,
+    authorization: oAuthToken
   };
-  console.log(headers);
+
   return headers;
 }
 
+
 const client = new ApolloClient({
-  // link: new HttpLink({ uri: URL.concat('/graphql') }),
+  // link: new HttpLink({ 
+  //   uri: URL.concat('/graphql?XDEBUG_SESSION_START=PHPSTORM'),
+  //   fetch: customFetch
+  // }),
   link: createUploadLink({
     uri: URL.concat('/graphql?XDEBUG_SESSION_START=PHPSTORM'),
-    headers: initializeHeaders(),
+    headers: initializeHeaders()
   }),
   cache: new InMemoryCache(),
 });
