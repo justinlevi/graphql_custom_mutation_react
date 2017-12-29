@@ -1,49 +1,36 @@
 import React, { Component } from 'react';
-
-
 import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
 
-import RecursiveIterator from 'recursive-iterator';
-import objectPath from 'object-path';
-
+const createNode = gql`
+  mutation($input: BasicPageInput!) {
+    addPage(input: $input){
+      entity{
+        ...on NodePage {
+          nid
+          title
+          body{
+            value
+          }
+        }
+      }
+    }
+  }
+`;
 
 class App extends Component {
 
-  // state = {
-  //     csrfToken: '',
-  //     oauthToken: {}
-  // };
-
   constructor(props){
     super(props);
-
-    this.handleChange = this.handleChange.bind(this);
+    this.createNode = this.createNode.bind(this);
   }
 
-  handleChange(target){
-
-    const formData  = new FormData();
-    
-    // search for File objects on the request and set it as formData
-    for(let { node, path } of new RecursiveIterator(target.variables)) {
-        if (node instanceof File) {
-            const id = Math.random().toString(36);
-            formData.append(id, node);
-            objectPath.set(target.variables, path.join('.'), id);
-        }
-    }
-    // Display the key/value pairs
-    // for (var pair of formData.entries()) {
-    //   console.log(pair);
-    // }
-
-    // 
-    // this.props.mutate({ variables: { file: target} })
+  createNode(target){
     this.props.mutate({ 
         variables: { 
           input : {
-            file: target.files[0].name
+            title: "Juniper" + new Date().toLocaleString(),
+            body: "Winter"
           } 
         }
       }
@@ -54,36 +41,13 @@ class App extends Component {
 
   render = () => {
     return ( 
-        <input
-          type="file"
-          required
-          onChange={({ target }) => {
-            target.validity.valid && this.handleChange(target)
-            }
-          }
-        />
+      <button >
+        <div onClick ={
+          () => {this.createNode()}
+        } > Create Node</div> 
+      </button>
     )
   }
-
 }
 
-
-const submitFile = gql`
-  mutation($input: FileInput!) {
-    uploadFile(input: $input)
-  }
-`;
-
-// const submitFile = gql`
-//   mutation($input: FileInput!) {
-//     uploadFile(input: $input){
-//       entity{
-//         ...on FileFile {
-//           url
-//         }
-//       }
-//     }
-//   }
-// `;
-
-export default graphql(submitFile)(App);
+export default graphql(createNode)(App);
