@@ -49,13 +49,6 @@ if(!sessionStorage.getItem('authorization')){
   initializeOauthToken();
 }
 
-// const customFetch = (uri, options) => {
-//   Object.assign(options.headers, { authorization: sessionStorage.getItem('authorization') });
-//   Object.assign(options.headers, { 'X-CSRF-Token': sessionStorage.getItem('csrfToken') });
-//   return fetch(uri, options);
-// };
-
-
 const authMiddleware = new ApolloLink((operation, forward) => {
   // add the authorization to the headers
   let oAuthToken = `Bearer ${sessionStorage.getItem('authorization')}`;
@@ -77,18 +70,6 @@ const client = new ApolloClient({
   link: concat(authMiddleware, httpLink),
   cache: new InMemoryCache(),
 });
-
-// const client = new ApolloClient({
-//   link: new HttpLink({
-//     uri: URL.concat('/graphql?XDEBUG_SESSION_START=PHPSTORM'),
-//     //fetch: customFetch
-//     headers: {
-//       authorization: sessionStorage.getItem('authorization'),
-//       'X-CSRF-Token': sessionStorage.getItem('csrfToken') 
-//     }
-//   }),
-//   cache: new InMemoryCache(),
-// });
 
 ReactDOM.render(
   <ApolloProvider client={client}>
